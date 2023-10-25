@@ -1,0 +1,21 @@
+<%- include('header') %>
+
+<div class="container">
+    <h2>Create Supplier</h2>
+    <form action="/suppliers" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="Name" required maxlength="450" />
+        <br />
+        <label for="supplierId">ID:</label>
+        <input type="number" id="supplierId" name="SupplierId" required />
+        <br />
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="Address" maxlength="450" />
+        <br />
+        <label for="createdByUser">Created By User (name):</label>
+        <input type="text" id="createdByUser" name="CreatedByUser" required maxlength="450" />
+        <br />
+        <button type="submit" id="confirmButton" class="mui-button btn-flat bg-teal">Create Supplier</button>
+    </form>
+</div>
+<%- include('footer') %>
