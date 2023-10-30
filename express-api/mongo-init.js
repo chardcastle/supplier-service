@@ -1,4 +1,7 @@
-console.log("Init custom DB instructions");
+/**
+ * This (JavaScript) file provides initial data for the mongo instance
+ */
+console.log("Init custom DB instructions 🚀");
 
 db.createUser({
     user: "supplier_service_user",
@@ -72,3 +75,5 @@ db.supplier_rates.insertMany([
         RateEndDate: undefined
     }
 ]);
+
+console.log("Finished custom DB instructions ✅");

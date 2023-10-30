@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
 
-const url = 'http://localhost:3001/suppliers';
+const url = 'http://localhost:3001/suppliers/list';
 function App() {
   const [stage, setStage] = useState([]);
 
