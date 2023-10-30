@@ -11,7 +11,7 @@ debug('supplier_service:index');
 const path = require("path");
 
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "src/views"));
+app.set("views", path.join(__dirname, "views"));
 
 app.use(express.json()); // For parsing JSON
 app.use(express.urlencoded({ extended: true })); //
