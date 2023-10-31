@@ -5,23 +5,12 @@ const request = require("supertest");
 const SupplierModel = require("./supplier.model");
 const supplierRoutes = require("./supplier.routes");
 
+const mockSuppliers = require("./__mocks__/mockSuppliers");
+jest.mock('./supplier.model');
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api', supplierRoutes);
-
-const mockSuppliers = [
-    { id: 1, name: 'Mocked supplier 1' },
-    { id: 2, name: 'Mocked supplier 2' },
-];
-
-jest.mock('./supplier.model', () => {
-    return {
-        // ...jest.requireActual('./supplier.model'), // Use the actual implementation
-        find: (req, res) => mockSuppliers,
-        create: () => mockSuppliers[0],
-        findByIdAndUpdate: () => true,
-    };
-});
 
 describe('GET Suppliers', () => {
     it('should return mocked data', async() => {
@@ -75,8 +64,8 @@ describe("PUT supplier/update/:id", () => {
 
 describe("DELETE supplier/:id", () => {
     beforeAll(() => {
-        jest.useFakeTimers('modern')
-        jest.setSystemTime(new Date('2023-10-31'))
+        jest.useFakeTimers("modern")
+        jest.setSystemTime(new Date("2023-10-31"))
     })
 
     afterAll(() => {
@@ -84,16 +73,21 @@ describe("DELETE supplier/:id", () => {
     })
 
     it("should complete successfully", async () => {
-        const findByIdAndUpdateSpy = jest.spyOn(SupplierModel, 'findByIdAndUpdate');
+        // noinspection JSCheckFunctionSignatures
+        const findByIdAndUpdateSpy = jest.spyOn(SupplierModel, "findByIdAndUpdate");
 
         const entityId = 1
         const { status } = await request(app)
             .delete(`/api/view/${entityId}`);
 
-        expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(String(entityId), { DeletedOn: new Date('2023-10-31').getTime() }, { new: true });
+        expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(
+            String(entityId),
+            { DeletedOn: new Date('2023-10-31').getTime() },
+            { new: true }
+        );
 
-        expect(status).toBe(202);
         findByIdAndUpdateSpy.mockRestore();
+        expect(status).toBe(202);
     });
 });
 
