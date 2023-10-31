@@ -42,4 +42,4 @@ const destroyById = async(id) => {
     return updateSupplierById(id, { DeletedOn: Date.now() })
 }
 
-module.exports = { getSuppliers, createSupplier, updateSupplierById, destroyById };
+module.exports = { getSuppliers, getSupplierById, createSupplier, updateSupplierById, destroyById };

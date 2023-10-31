@@ -10,13 +10,13 @@ jest.mock('./supplier.model');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api', supplierRoutes);
+app.use('/test-route', supplierRoutes);
 
-describe('GET Suppliers', () => {
-    it('should return mocked data', async() => {
+describe('GET /test-route/list', () => {
+    it('should complete successfully', async() => {
 
         const { status, body } = await request(app)
-            .get("/api/list")
+            .get("/test-route/list")
             .set("Accept", "application/json")
             .expect('content-type', /json/);
 
@@ -25,8 +25,22 @@ describe('GET Suppliers', () => {
     });
 });
 
-describe("POST", () => {
-    it ("POST /api/create", async () => {
+describe('GET /test-route/view/:id', () => {
+    it('should complete successfully', async() => {
+        const expectedSupplier = mockSuppliers[0];
+        const { id } = expectedSupplier;
+        const { status, body } = await request(app)
+            .get(`/test-route/view/${id}`)
+            .set("Accept", "application/json")
+            .expect('content-type', /json/);
+
+        expect(body).toEqual(expectedSupplier);
+        expect(status).toBe(200);
+    });
+});
+
+describe("POST /test-route/create", () => {
+    it ("should complete successfully", async () => {
         const newUser = {
             Name: 'Test User',
             // SupplierId: 1,
@@ -36,7 +50,7 @@ describe("POST", () => {
         const { Name: expectedName } = newUser;
 
         const { status, text } = await request(app)
-            .post("/api/create")
+            .post("/test-route/create")
             .send(newUser)
             .expect('Content-Type', /html/);
 
@@ -45,7 +59,7 @@ describe("POST", () => {
     });
 });
 
-describe("PUT supplier/update/:id", () => {
+describe("PUT /test-route/update/:id", () => {
     it("should complete successfully", async () => {
         const supplierAmends = {
             Name: 'Amended supplier name',
@@ -55,7 +69,7 @@ describe("PUT supplier/update/:id", () => {
         const { id } = existingUser;
 
         const { status } = await request(app)
-            .put(`/api/update/${id}`)
+            .put(`/test-route/update/${id}`)
             .send(supplierAmends);
 
         expect(status).toBe(204);
@@ -78,7 +92,7 @@ describe("DELETE supplier/:id", () => {
 
         const entityId = 1
         const { status } = await request(app)
-            .delete(`/api/view/${entityId}`);
+            .delete(`/test-route/view/${entityId}`);
 
         expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(
             String(entityId),
