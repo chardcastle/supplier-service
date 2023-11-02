@@ -1,6 +1,11 @@
 /**
  * This (JavaScript) file provides initial data for the mongo instance
+ *
+ * This is run on the first instance of the attached volume being created. To re-run, delete the existing docker volume!
+ * The JavaScript object within the container is not in scope of a code editor. This is why inspections can be ignored.
  */
+/* eslint-disable no-undef */
+// noinspection JSUnresolvedReference
 console.log("Init custom DB instructions 🚀");
 
 db.createUser({

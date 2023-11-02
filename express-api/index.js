@@ -1,12 +1,12 @@
 const port = 3001;
 const express = require("express");
 const app = express();
-const util = require('node:util');
+const util = require("node:util");
 const cors = require("cors");
 app.use(cors());
 
 const debug = require("debug");
-debug('supplier_service:index');
+debug("supplier_service:index");
 
 const path = require("path");
 
@@ -24,25 +24,25 @@ mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => debug('connected'))
+.then(() => debug("connected"))
 .catch(e => debug("Oh no, unable to connect to database! 🚨", e));
 
-mongoose.connection.on('error', () => {
+mongoose.connection.on("error", () => {
     throw new Error(`There was a connection error trying to use: ${mongoUri}`);
 });
 
-mongoose.set('debug', (collectionName, method, query, doc) => {
+mongoose.set("debug", (collectionName, method, query, doc) => {
     debug(`${collectionName}.${method}`, util.inspect(query, false, 20), doc);
 });
 
-const supplierRoutes = require("./supplier/supplier.routes.js")
-app.use('/suppliers', supplierRoutes);
+const supplierRoutes = require("./supplier/supplier.routes.js");
+app.use("/suppliers", supplierRoutes);
 
-app.use((req, res, next) => {
+app.use((req, res) => {
     res.status(404).send("Sorry can't find that!");
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     console.error(err.stack);
     res.status(500).send("Something broke!");
 });

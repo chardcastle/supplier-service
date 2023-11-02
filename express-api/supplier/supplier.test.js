@@ -1,38 +1,37 @@
 const express = require("express");
-const debug = require("debug")("ctl");
 const app = express();
 const request = require("supertest");
 const SupplierModel = require("./supplier.model");
 const supplierRoutes = require("./supplier.routes");
 
 const mockSuppliers = require("./__mocks__/mockSuppliers");
-jest.mock('./supplier.model');
+jest.mock("./supplier.model");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/test-route', supplierRoutes);
+app.use("/test-route", supplierRoutes);
 
-describe('GET /test-route/list', () => {
-    it('should complete successfully', async() => {
+describe("GET /test-route/list", () => {
+    it("should complete successfully", async() => {
 
         const { status, body } = await request(app)
             .get("/test-route/list")
             .set("Accept", "application/json")
-            .expect('content-type', /json/);
+            .expect("content-type", /json/);
 
         expect(body).toEqual(mockSuppliers);
         expect(status).toBe(200);
     });
 });
 
-describe('GET /test-route/view/:id', () => {
-    it('should complete successfully', async() => {
+describe("GET /test-route/view/:id", () => {
+    it("should complete successfully", async() => {
         const expectedSupplier = mockSuppliers[0];
         const { id } = expectedSupplier;
         const { status, body } = await request(app)
             .get(`/test-route/view/${id}`)
             .set("Accept", "application/json")
-            .expect('content-type', /json/);
+            .expect("content-type", /json/);
 
         expect(body).toEqual(expectedSupplier);
         expect(status).toBe(200);
@@ -42,7 +41,7 @@ describe('GET /test-route/view/:id', () => {
 describe("POST /test-route/create", () => {
     it ("should complete successfully", async () => {
         const newUser = {
-            Name: 'Test User',
+            Name: "Test User",
             // SupplierId: 1,
             CreatedByUser: "Chris",
             Address: "Street",
@@ -52,7 +51,7 @@ describe("POST /test-route/create", () => {
         const { status, text } = await request(app)
             .post("/test-route/create")
             .send(newUser)
-            .expect('Content-Type', /html/);
+            .expect("Content-Type", /html/);
 
         expect(status).toBe(201);
         expect(text).toEqual(`Created supplier: ${expectedName}`);
@@ -62,7 +61,7 @@ describe("POST /test-route/create", () => {
 describe("PUT /test-route/update/:id", () => {
     it("should complete successfully", async () => {
         const supplierAmends = {
-            Name: 'Amended supplier name',
+            Name: "Amended supplier name",
         };
 
         const [existingUser] = mockSuppliers;
@@ -78,25 +77,25 @@ describe("PUT /test-route/update/:id", () => {
 
 describe("DELETE supplier/:id", () => {
     beforeAll(() => {
-        jest.useFakeTimers("modern")
-        jest.setSystemTime(new Date("2023-10-31"))
-    })
+        jest.useFakeTimers("modern");
+        jest.setSystemTime(new Date("2023-10-31"));
+    });
 
     afterAll(() => {
-        jest.useRealTimers()
-    })
+        jest.useRealTimers();
+    });
 
     it("should complete successfully", async () => {
         // noinspection JSCheckFunctionSignatures
         const findByIdAndUpdateSpy = jest.spyOn(SupplierModel, "findByIdAndUpdate");
 
-        const entityId = 1
+        const entityId = 1;
         const { status } = await request(app)
             .delete(`/test-route/view/${entityId}`);
 
         expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(
             String(entityId),
-            { DeletedOn: new Date('2023-10-31').getTime() },
+            { DeletedOn: new Date("2023-10-31").getTime() },
             { new: true }
         );
 

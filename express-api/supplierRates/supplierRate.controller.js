@@ -5,7 +5,7 @@ const debug = require("debug")("ctl");
 const getSupplierRates = async () => {
     debug("Fetching supplier rates");
 
-    const model = mongoose.model('SupplierRate');
+    const model = mongoose.model("SupplierRate");
     return model.find({});
 };
 

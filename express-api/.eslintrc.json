@@ -15,5 +15,16 @@
     "quotes": ["error", "double"],
     "semi": ["error", "always"],
     "func-style": ["error", "declaration", { "allowArrowFunctions": true }]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.js",
+        "**/*.test.jsx"
+      ],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
 }

@@ -33,13 +33,13 @@ router.post("/create",async (req, res) => {
         res.status(422).end();
     }
 
-    const supplierData = { ...req.body, CreatedOn: Date.now() }
+    const supplierData = { ...req.body, CreatedOn: Date.now() };
     const { Name } = supplierData;
     await createSupplier(supplierData);
     debug(`Returning "Created supplier: ${Name}"`);
 
     res.set(
-        {'Content-Type': 'text/html'}
+        {"Content-Type": "text/html"}
     ).status(201).end(`Created supplier: ${Name}`);
 });
 
@@ -50,7 +50,7 @@ router.put("/update/:id",async (req, res) => {
         res.status(422).end();
     }
 
-    const supplierData = { ...req.body, CreatedOn: Date.now() }
+    const supplierData = { ...req.body, CreatedOn: Date.now() };
     const { Name } = supplierData;
     await updateSupplierById(id, supplierData);
     res.status(204).send(`Created supplier: ${Name}`);

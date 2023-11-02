@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const SupplierModel = require("./supplier.model");
 const debug = require("debug")("ctl");
 
@@ -39,7 +38,7 @@ const updateSupplierById = async(id, data) => {
 };
 
 const destroyById = async(id) => {
-    return updateSupplierById(id, { DeletedOn: Date.now() })
-}
+    return updateSupplierById(id, { DeletedOn: Date.now() });
+};
 
 module.exports = { getSuppliers, getSupplierById, createSupplier, updateSupplierById, destroyById };

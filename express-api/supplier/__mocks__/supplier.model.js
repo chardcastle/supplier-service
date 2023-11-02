@@ -1,7 +1,7 @@
 const mockSuppliers = require("./mockSuppliers");
 
 const SupplierModelMock = {
-    find: (req, res) => mockSuppliers,
+    find: () => mockSuppliers,
     create: () => mockSuppliers[0],
     findByIdAndUpdate: () => true,
     findById: () =>  mockSuppliers[0],
