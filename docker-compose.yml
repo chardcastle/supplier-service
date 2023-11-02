@@ -27,7 +27,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      MONGO_URI: mongodb://supplier_service_user:supersecure@mongodb:27017/supplier_service
+      MONGO_URI: mongodb://supplier_service_user:supersecure@mongodb:27017/supplier_service?authSource=admin
       NODE_ENV: dev
       DEBUG: ctl
 
