@@ -1,22 +1,26 @@
 const port = 3001;
-const express = require("express");
+import express from 'express';
+import { inspect } from 'util';
+import cors from 'cors';
+import Debug from "debug";
+const debug = Debug("ctl");
+import supplierRoutes from "./supplier/supplier.routes.js";
+import mongoose from "mongoose";
+
 const app = express();
-const util = require("node:util");
-const cors = require("cors");
 app.use(cors());
 
-const debug = require("debug");
 debug("supplier_service:index");
-
-const path = require("path");
-
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.set("views", `${process.cwd()}/views`);
 
-app.use(express.json()); // For parsing JSON
+app.get('/', (req, res) => {
+    res.render("home");
+});
+
+app.use(express.json());
 app.use(express.urlencoded({ extended: true })); //
 
-const mongoose = require("mongoose");
 const mongoUri = process.env.MONGO_URI;
 mongoose.Promise = Promise;
 
@@ -25,17 +29,12 @@ mongoose.connect(mongoUri, {
     useUnifiedTopology: true,
 })
 .then(() => debug("connected"))
-.catch(e => debug("Oh no, unable to connect to database! 🚨", e));
-
-mongoose.connection.on("error", () => {
-    throw new Error(`There was a connection error trying to use: ${mongoUri}`);
-});
+.catch(e => debug(`Oh no, unable to connect to database, using ${mongoUri}! 🚨`, e));
 
 mongoose.set("debug", (collectionName, method, query, doc) => {
-    debug(`${collectionName}.${method}`, util.inspect(query, false, 20), doc);
+    debug(`${collectionName}.${method}`, inspect(query, false, 20), doc);
 });
 
-const supplierRoutes = require("./supplier/supplier.routes.js");
 app.use("/suppliers", supplierRoutes);
 
 app.use((req, res) => {
@@ -47,7 +46,7 @@ app.use((err, req, res) => {
     res.status(500).send("Something broke!");
 });
 
-if (!module.parent) {
+if (!app.listening) {
     app.listen(port, () => {
         console.log(`Example app listening on port ${port}`);
     });

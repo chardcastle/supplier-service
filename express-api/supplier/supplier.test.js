@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
 const app = express();
-const request = require("supertest");
-const SupplierModel = require("./supplier.model");
-const supplierRoutes = require("./supplier.routes");
+import { jest } from '@jest/globals';
+import request from "supertest";
+import SupplierModel from "./supplier.model";
+import supplierRoutes from "./supplier.routes";
 
 const mockSuppliers = require("./__mocks__/mockSuppliers");
 jest.mock("./supplier.model");
@@ -95,8 +96,7 @@ describe("DELETE supplier/:id", () => {
 
         expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(
             String(entityId),
-            { DeletedOn: new Date("2023-10-31").getTime() },
-            { new: true }
+            { DeletedOn: new Date("2023-10-31").getTime() }
         );
 
         findByIdAndUpdateSpy.mockRestore();

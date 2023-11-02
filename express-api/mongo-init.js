@@ -8,12 +8,13 @@
 // noinspection JSUnresolvedReference
 console.log("Init custom DB instructions 🚀");
 
+db = new Mongo().getDB("admin");
+
 db.createUser({
     user: "supplier_service_user",
     pwd: "supersecure",
-    roles: [{ role: "readWrite", db: "supplier_service" }]
+    roles: [{ role: "readWrite", db: "supplier_service" }],
 });
-
 
 db = new Mongo().getDB("supplier_service");
 

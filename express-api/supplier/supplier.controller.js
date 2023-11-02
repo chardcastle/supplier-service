@@ -1,11 +1,11 @@
-const SupplierModel = require("./supplier.model");
-const debug = require("debug")("ctl");
+import SupplierModel from "./supplier.model.js";
+import Debug from "debug";
+const debug = Debug("ctl");
 
 const getSuppliers = async () => {
     debug("Fetching suppliers");
 
-    // const model = mongoose.model('Supplier');
-    return SupplierModel.find({ DeletedOn: null, new: true });
+    return SupplierModel.find({ DeletedOn: null });
 };
 
 const getSupplierById = async(id) => {
@@ -21,7 +21,7 @@ const createSupplier = async(data) => {
 const updateSupplierById = async(id, data) => {
     try {
         // TODO Add validation
-        const supplier = await SupplierModel.findByIdAndUpdate(id, data, { new: true });
+        const supplier = await SupplierModel.findByIdAndUpdate(id, data);
         debug("Updated supplier with", { supplier, id, data });
         if (!supplier) {
             debug("Supplier not found");
@@ -41,4 +41,4 @@ const destroyById = async(id) => {
     return updateSupplierById(id, { DeletedOn: Date.now() });
 };
 
-module.exports = { getSuppliers, getSupplierById, createSupplier, updateSupplierById, destroyById };
+export { getSuppliers, getSupplierById, createSupplier, updateSupplierById, destroyById };

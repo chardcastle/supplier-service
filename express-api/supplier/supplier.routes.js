@@ -1,14 +1,16 @@
-const express = require("express");
-const debug = require("debug")("ctl");
+import express from "express";
+import Debug from "debug";
 const router = express.Router();
 
-const {
+const debug = Debug("route");
+
+import {
     getSuppliers,
     getSupplierById,
     createSupplier,
     updateSupplierById,
     destroyById,
-} = require("./supplier.controller");
+} from "./supplier.controller.js";
 
 router.get("/list", async (req, res) => {
     const suppliers =  await getSuppliers();
@@ -64,4 +66,4 @@ router.delete("/view/:id", async (req, res) => {
     res.status(softlyDeletedHTTPResponseCode).end();
 });
 
-module.exports = router;
+export default router;

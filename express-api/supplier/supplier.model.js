@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const SupplierSchema = new mongoose.Schema({
     SupplierId: {
@@ -23,8 +23,11 @@ const SupplierSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
+    DeletedOn: {
+        type: Date
+    },
 });
 
 const SupplierModel = mongoose.model("Supplier", SupplierSchema);
 
-module.exports = SupplierModel;
+export default SupplierModel;
