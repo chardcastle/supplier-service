@@ -6,7 +6,6 @@ import SupplierModel from "./supplier.model";
 import supplierRoutes from "./supplier.routes";
 import { apiError, apiSuccess, normaliseItemsById } from "../helpers/apiResponses.js";
 
-const mockSuppliers = require("./__mocks__/mockSuppliers");
 jest.mock("./supplier.model");
 
 app.use(express.json());
@@ -21,40 +20,52 @@ describe("GET /test-route/list", () => {
             .set("Accept", "application/json")
             .expect("content-type", /json/);
 
-        expect(body).toEqual(apiSuccess(200, normaliseItemsById(mockSuppliers)));
+        expect(body).toEqual(
+            apiSuccess(
+                200,
+                normaliseItemsById([
+                    { id: 1, name: "Mocked supplier 1" },
+                    { id: 2, name: "Mocked supplier 2" },
+                ])
+            )
+        );
         expect(status).toBe(200);
     });
 });
 
 describe("GET /test-route/view/:id", () => {
-    it("should complete successfully", async() => {
-        const expectedSupplier = mockSuppliers[0];
-        const findByIdSpy = jest.spyOn(SupplierModel, "findById");
+    let findByIdSpy;
 
-        const { id } = expectedSupplier;
-        const { status, body } = await request(app)
-            .get(`/test-route/view/${id}`)
-            .set("Accept", "application/json")
-            .expect("content-type", /json/);
+    beforeEach(() => {
+        findByIdSpy = jest.spyOn(SupplierModel, "findById");
+    });
 
-        expect(body).toEqual(expectedSupplier);
-        expect(status).toBe(200);
-        expect(findByIdSpy).toHaveBeenCalledWith(String(id));
-        expect(findByIdSpy).toHaveBeenCalledTimes(1);
+    afterEach(() => {
         findByIdSpy.mockRestore();
     });
 
+    it("should complete successfully", async() => {
+        const { status, body } = await request(app)
+            .get(`/test-route/view/1`)
+            .set("Accept", "application/json")
+            .expect("content-type", /json/);
+
+        expect(body).toEqual(apiSuccess(200, { id: 1, name: "Mocked supplier 1" }));
+        expect(status).toBe(200);
+        expect(findByIdSpy).toHaveBeenCalledWith(String(1));
+        expect(findByIdSpy).toHaveBeenCalledTimes(1);
+    });
+
     it("should gracefully use apiError if not found", async () => {
-        const mockedFindById = jest.spyOn(SupplierModel, "findById");
-        mockedFindById.mockImplementation(() => null);
+        findByIdSpy.mockImplementation(() => null);
+
         const { status, body } = await request(app)
             .get("/test-route/view/999")
             .set("Accept", "application/json")
             .expect("content-type", /json/);
 
-        expect(mockedFindById).toHaveBeenCalledWith(String(999));
-        expect(mockedFindById).toHaveBeenCalledTimes(1);
-        mockedFindById.mockRestore();
+        expect(findByIdSpy).toHaveBeenCalledWith(String(999));
+        expect(findByIdSpy).toHaveBeenCalledTimes(1);
 
         expect(body).toEqual(apiError(404, { message: "Unable to find supplier with id 999" }));
         expect(status).toBe(404);
@@ -102,9 +113,7 @@ describe("PUT /test-route/update/:id", () => {
             Name: "Amended supplier name",
         };
 
-        const [existingUser] = mockSuppliers;
-        const { id } = existingUser;
-
+        const { id } = 1;
         const { status } = await request(app)
             .put(`/test-route/update/${id}`)
             .send(supplierAmends);

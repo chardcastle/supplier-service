@@ -1,6 +1,5 @@
 import SupplierModel from "./supplier.model.js";
 import Debug from "debug";
-import mongoose from "mongoose";
 const debug = Debug("ctl");
 
 const getSuppliers = async () => {
@@ -19,9 +18,11 @@ const getSupplierById = async(id) => {
 };
 
 const createSupplier = async(data) => {
-    debug("Creating with", data);
+    const submittedSupplier = new SupplierModel(data);
 
-    return SupplierModel.create(data);
+    submittedSupplier.save().then(res => {
+        return res;
+    });
 };
 
 const updateSupplierById = async(id, data) => {

@@ -21,13 +21,16 @@ router.get("/list", async (req, res) => {
 
 router.get("/view/:id", async (req, res) => {
     const { id } = req.params;
+
     return getSupplierById(id)
+        .then((supplier) => {
+            debug("success supplier", supplier);
+            return res.status(200).json(apiSuccess(200, supplier ));
+        })
         .catch(err => {
             debug("error", err.message);
-            res.status(404)
+            return res.status(404)
                 .json(apiError(404, { message: `Unable to find supplier with id ${id}`}));
-        }).then((supplier) => {
-            res.status(200).json(supplier);
         });
 });
 

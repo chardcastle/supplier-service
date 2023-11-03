@@ -14,10 +14,12 @@ const apiError = (status, data) => {
     };
 };
 
-function normaliseItemsById(dataObjectsById) {
+const normaliseItemsById = (dataObjectsById) => {
     const normalised = {};
-    for (const supplier of dataObjectsById) {
-        normalised[supplier.id] = supplier;
+
+    for (const item of [].concat(dataObjectsById)) {
+        const { id } = item;
+        normalised[id] = item;
     }
     return normalised;
 }
