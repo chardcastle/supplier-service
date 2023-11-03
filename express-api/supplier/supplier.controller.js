@@ -1,5 +1,6 @@
 import SupplierModel from "./supplier.model.js";
 import Debug from "debug";
+import mongoose from "mongoose";
 const debug = Debug("ctl");
 
 const getSuppliers = async () => {
@@ -9,7 +10,12 @@ const getSuppliers = async () => {
 };
 
 const getSupplierById = async(id) => {
-    return SupplierModel.findById(id);
+    const supplier = await SupplierModel.findById(id);
+    if (null === supplier) {
+        throw new Error("Not found");
+    }
+
+    return supplier;
 };
 
 const createSupplier = async(data) => {

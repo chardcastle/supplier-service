@@ -1,7 +1,8 @@
 const port = 3001;
-import express from 'express';
-import { inspect } from 'util';
-import cors from 'cors';
+import express from "express";
+import { inspect } from "util";
+import cors from "cors";
+import is404 from "./middlewear/is-404.js";
 import Debug from "debug";
 const debug = Debug("ctl");
 import supplierRoutes from "./supplier/supplier.routes.js";
@@ -40,6 +41,8 @@ app.use("/suppliers", supplierRoutes);
 app.use((req, res) => {
     res.status(404).send("Sorry can't find that!");
 });
+
+app.use(is404);
 
 app.use((err, req, res) => {
     console.error(err.stack);

@@ -4,6 +4,7 @@ import { jest } from '@jest/globals';
 import request from "supertest";
 import SupplierModel from "./supplier.model";
 import supplierRoutes from "./supplier.routes";
+import { apiError, apiSuccess, normaliseItemsById } from "../helpers/apiResponses.js";
 
 const mockSuppliers = require("./__mocks__/mockSuppliers");
 jest.mock("./supplier.model");
@@ -20,7 +21,7 @@ describe("GET /test-route/list", () => {
             .set("Accept", "application/json")
             .expect("content-type", /json/);
 
-        expect(body).toEqual(mockSuppliers);
+        expect(body).toEqual(apiSuccess(200, normaliseItemsById(mockSuppliers)));
         expect(status).toBe(200);
     });
 });
@@ -28,6 +29,8 @@ describe("GET /test-route/list", () => {
 describe("GET /test-route/view/:id", () => {
     it("should complete successfully", async() => {
         const expectedSupplier = mockSuppliers[0];
+        const findByIdSpy = jest.spyOn(SupplierModel, "findById");
+
         const { id } = expectedSupplier;
         const { status, body } = await request(app)
             .get(`/test-route/view/${id}`)
@@ -36,27 +39,61 @@ describe("GET /test-route/view/:id", () => {
 
         expect(body).toEqual(expectedSupplier);
         expect(status).toBe(200);
+        expect(findByIdSpy).toHaveBeenCalledWith(String(id));
+        expect(findByIdSpy).toHaveBeenCalledTimes(1);
+        findByIdSpy.mockRestore();
+    });
+
+    it("should gracefully use apiError if not found", async () => {
+        const mockedFindById = jest.spyOn(SupplierModel, "findById");
+        mockedFindById.mockImplementation(() => null);
+        const { status, body } = await request(app)
+            .get("/test-route/view/999")
+            .set("Accept", "application/json")
+            .expect("content-type", /json/);
+
+        expect(mockedFindById).toHaveBeenCalledWith(String(999));
+        expect(mockedFindById).toHaveBeenCalledTimes(1);
+        mockedFindById.mockRestore();
+
+        expect(body).toEqual(apiError(404, { message: "Unable to find supplier with id 999" }));
+        expect(status).toBe(404);
     });
 });
 
 describe("POST /test-route/create", () => {
     it ("should complete successfully", async () => {
-        const newUser = {
+        const newSupplier = {
             Name: "Test User",
-            // SupplierId: 1,
+            SupplierId: 1,
             CreatedByUser: "Chris",
             Address: "Street",
         };
-        const { Name: expectedName } = newUser;
+        const { Name: expectedName } = newSupplier;
 
         const { status, text } = await request(app)
             .post("/test-route/create")
-            .send(newUser)
+            .send(newSupplier)
             .expect("Content-Type", /html/);
 
         expect(status).toBe(201);
         expect(text).toEqual(`Created supplier: ${expectedName}`);
     });
+
+    // it ("should gracefully fail", async () => {
+    //     const newSupplier = {
+    //         Name: "Test User",
+    //     };
+    //     const { Name: expectedName } = newSupplier;
+    //
+    //     const { status, text } = await request(app)
+    //         .post("/test-route/create")
+    //         .send(newSupplier)
+    //         .expect("Content-Type", /html/);
+    //
+    //     expect(status).toBe(201);
+    //     expect(text).toEqual(`Created supplier: ${expectedName}`);
+    // });
 });
 
 describe("PUT /test-route/update/:id", () => {

@@ -2,7 +2,7 @@ import express from "express";
 import Debug from "debug";
 const router = express.Router();
 
-const debug = Debug("route");
+const debug = Debug("ctl");
 
 import {
     getSuppliers,
@@ -11,19 +11,24 @@ import {
     updateSupplierById,
     destroyById,
 } from "./supplier.controller.js";
+import { apiSuccess, apiError, normaliseItemsById } from "../helpers/apiResponses.js";
 
 router.get("/list", async (req, res) => {
     const suppliers =  await getSuppliers();
 
-    // TODO Return normalised json { 1: { id: 1 }, 2: { id: 2 } }
-    res.status(200).json(suppliers);
+    res.status(200).json(apiSuccess(200, normaliseItemsById(suppliers)));
 });
 
 router.get("/view/:id", async (req, res) => {
     const { id } = req.params;
-    const supplier =  await getSupplierById(id);
-
-    res.status(200).json(supplier);
+    return getSupplierById(id)
+        .catch(err => {
+            debug("error", err.message);
+            res.status(404)
+                .json(apiError(404, { message: `Unable to find supplier with id ${id}`}));
+        }).then((supplier) => {
+            res.status(200).json(supplier);
+        });
 });
 
 router.get("/create", (req, res) => {
