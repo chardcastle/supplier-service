@@ -1,6 +1,7 @@
 import express from "express";
 import Debug from "debug";
 const router = express.Router();
+import mongoose from "mongoose";
 
 const debug = Debug("ctl");
 
@@ -14,8 +15,9 @@ import {
 import { apiSuccess, apiError, normaliseItemsById } from "../helpers/apiResponses.js";
 
 router.get("/list", async (req, res) => {
+    debug("1 DB status", mongoose.connection.readyState);
     const suppliers =  await getSuppliers();
-
+    debug("3 DB status", mongoose.connection.readyState);
     res.status(200).json(apiSuccess(200, normaliseItemsById(suppliers)));
 });
 
@@ -39,18 +41,18 @@ router.get("/create", (req, res) => {
 });
 
 router.post("/create",async (req, res) => {
-    if (req.body === undefined) {
-        res.status(422).end();
-    }
-
     const supplierData = { ...req.body, CreatedOn: Date.now() };
-    const { Name } = supplierData;
-    await createSupplier(supplierData);
-    debug(`Returning "Created supplier: ${Name}"`);
-
-    res.set(
-        {"Content-Type": "text/html"}
-    ).status(201).end(`Created supplier: ${Name}`);
+    debug("Data is ", supplierData);
+    debug("A DB status", mongoose.connection.readyState);
+    return createSupplier(supplierData)
+        .then(supplier => {
+            debug("Response is ", supplier);
+            const { Name } = supplier;
+            return res.status(201).json(apiSuccess(201, { message: `Created supplier: ${Name}` }));
+        })
+        .catch(errors => {
+            return res.status(422).json(apiError(422, { message: "Oops", errors: normaliseItemsById(errors) }));
+        });
 });
 
 router.put("/update/:id",async (req, res) => {

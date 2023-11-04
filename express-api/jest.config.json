@@ -3,5 +3,7 @@
     "testEnvironment": "node",
     "transformIgnorePatterns": [
         "/node_modules/*"
-    ]
+    ],
+    "globalSetup": "./globalSetup.js",
+    "globalTeardown": "./globalTeardown.js"
 }
