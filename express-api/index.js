@@ -25,12 +25,16 @@ app.use(express.urlencoded({ extended: true })); //
 const mongoUri = process.env.MONGO_URI;
 mongoose.Promise = Promise;
 
-mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => debug("connected"))
-.catch(e => debug(`Oh no, unable to connect to database, using ${mongoUri}! 🚨`, e));
+// mongoose.connect(mongoUri, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// })
+// .then(() => debug("connected"))
+// .catch(e => debug(`Oh no, unable to connect to database, using ${mongoUri}! 🚨`, e));
+
+mongoose.connect(mongoUri)
+    .then(() => debug("connected"))
+    .catch(e => debug(`Oh no, unable to connect to database, using ${mongoUri}! 🚨`, e));
 
 mongoose.set("debug", (collectionName, method, query, doc) => {
     debug(`${collectionName}.${method}`, inspect(query, false, 20), doc);

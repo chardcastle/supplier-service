@@ -43,17 +43,14 @@ router.get("/create", (req, res) => {
 router.post("/create",async (req, res) => {
     const supplierData = { ...req.body, CreatedOn: Date.now() };
     debug("Data is ", supplierData);
-    // debug("A DB status", mongoose.connection.readyState);
-    return createSupplier(supplierData)
-        .then(supplier => {
-            debug("Response good!", supplier);
-            const { Name } = supplier;
-            res.status(201).json(apiSuccess(201, { message: `Created supplier: ${Name}` }));
-        })
-        .catch(errors => {
-            debug("OOps is ", errors);
-            res.status(422).json(apiError(422, { message: "Oops", errors: normaliseItemsById(errors) }));
-        });
+
+    try {
+        const { Name } = await createSupplier(supplierData);
+
+        return res.status(201).json(apiSuccess(201, { message: `Created supplier: ${Name}` }));
+    } catch (errors) {
+        return res.status(422).json(apiError(422, { message: "Oops", errors: normaliseItemsById(errors) }));
+    }
 });
 
 router.put("/update/:id",async (req, res) => {

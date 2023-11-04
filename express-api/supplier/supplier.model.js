@@ -21,7 +21,7 @@ import mongoose from "mongoose";
 // DeletedOn: 1699029964126
 // }
 
-const SupplierSchema = new mongoose.Schema({
+export const SupplierSchema = new mongoose.Schema({
     SupplierId: {
         type: Number,
         required:[true, "Provide a supplier ID (number)"],

@@ -3,31 +3,30 @@ import { MongoClient } from "mongodb";
 import express from "express";
 const app = express();
 import request from "supertest";
-import SupplierModel from "./supplier.model";
+import SupplierModel, {SupplierSchema} from "./supplier.model";
 import supplierRoutes from "./supplier.routes";
 import { apiError, apiSuccess, normaliseItemsById } from "../helpers/apiResponses.js";
 import mongoose from "mongoose";
 import Debug from "debug";
-
+const debug = Debug("clt");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/test-route", supplierRoutes);
 
-let connection;
-let db;
-// const client = new MongoClient(process.env.MONGO_URI, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// });
+const mongoUri = process.env.MONGO_URI;
 
 beforeAll(async () => {
-    connection = await MongoClient.connect(process.env.MONGO_URI);
-    db = await connection.db();
+    mongoose.Promise = Promise;
+    await mongoose.connect(mongoUri)
+        .then(() => debug("connected"))
+        .catch(e => debug(`Oh no, unable to connect to database, using ${mongoUri}! 🚨`, e));
+
+    expect(mongoose.connection.readyState).toBe(1);
 });
 
 afterAll(async () => {
-    await connection.close();
+    await mongoose.connection.close();
 });
 
 describe("GET /test-route/list", () => {
@@ -91,7 +90,7 @@ describe("GET /test-route/view/:id", () => {
         expect(findByIdSpy).toHaveBeenCalledTimes(1);
     });
 
-    it("should gracefully use apiError if not found", async () => {
+    it("should fail gracefully use apiError if not found", async () => {
         findByIdSpy.mockImplementation(() => null);
 
         const { status, body } = await request(app)
@@ -111,16 +110,21 @@ describe("POST /test-route/create", () => {
     let createSpy;
 
     beforeEach(() => {
-        createSpy = jest.spyOn(SupplierModel, "create");
+        // TODO Provide good spy
+        // createSpy = jest.spyOn(SupplierSchema, "pre")
+        //     .mockImplementationOnce(function (event, middleware) {
+        //         const continueProcessing =  jest.fn(next => next());
+        //         if (event !== 'save') {
+        //             middleware.call(this, continueProcessing);
+        //         }
+        //     });
     });
 
     afterEach(() => {
-        createSpy.mockRestore();
+        // createSpy.mockRestore();
     });
 
     it ("should complete successfully", async () => {
-        // expect(connection.db.readyState).toBe(1);
-
         const newSupplier = {
             Name: "Test person",
             SupplierId: 1,
@@ -128,22 +132,6 @@ describe("POST /test-route/create", () => {
             Address: "Street",
         };
         const { Name: expectedName } = newSupplier;
-
-        // const preSaveMock = jest.fn(function (next) {
-        //     // Mock the pre-save logic here
-        //     // For example, you can just call next() to simulate successful save
-        //     // next();
-        //     next();
-        // });
-        //
-        // // Replace the original pre middleware with the mock function
-        // jest.spyOn(SupplierModel.schema, 'pre').mockImplementationOnce(function (event, middleware) {
-        //     if (event === 'save') {
-        //         // Call the mock function for the 'save' event
-        //         middleware.call(this, preSaveMock);
-        //     }
-        // });
-
 
         const { status, body: { data: { message } } } = await request(app)
             .post("/test-route/create")
@@ -154,9 +142,7 @@ describe("POST /test-route/create", () => {
         expect(status).toBe(201);
     });
 
-    it ("should gracefully fail", async () => {
-        // expect(db.readyState).toBe(1);
-
+    it ("should fail gracefully", async () => {
         const incompletePayload = {
             Name: "Test User",
             SupplierId: 666,
