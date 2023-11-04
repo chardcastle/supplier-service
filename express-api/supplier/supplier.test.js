@@ -1,6 +1,7 @@
+import { jest } from "@jest/globals";
+import { MongoClient } from "mongodb";
 import express from "express";
 const app = express();
-import { jest } from '@jest/globals';
 import request from "supertest";
 import SupplierModel from "./supplier.model";
 import supplierRoutes from "./supplier.routes";
@@ -12,6 +13,22 @@ import Debug from "debug";
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/test-route", supplierRoutes);
+
+let connection;
+let db;
+// const client = new MongoClient(process.env.MONGO_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// });
+
+beforeAll(async () => {
+    connection = await MongoClient.connect(process.env.MONGO_URI);
+    db = await connection.db();
+});
+
+afterAll(async () => {
+    await connection.close();
+});
 
 describe("GET /test-route/list", () => {
     let findSpy;
@@ -102,10 +119,10 @@ describe("POST /test-route/create", () => {
     });
 
     it ("should complete successfully", async () => {
-        // expect(globalThis.__MONGOD__.connection.readyState).toBe(1);
+        // expect(connection.db.readyState).toBe(1);
 
         const newSupplier = {
-            Name: "Test User",
+            Name: "Test person",
             SupplierId: 1,
             CreatedByUser: "Chris",
             Address: "Street",
@@ -138,7 +155,7 @@ describe("POST /test-route/create", () => {
     });
 
     it ("should gracefully fail", async () => {
-        // expect(globalThis.__MONGOD__.connection.readyState).toBe(1);
+        // expect(db.readyState).toBe(1);
 
         const incompletePayload = {
             Name: "Test User",

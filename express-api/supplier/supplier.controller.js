@@ -20,12 +20,12 @@ const getSupplierById = async(id) => {
 
 const createSupplier = async(data) => {
     // data.DeletedOn = Date.now();
-    debug("B DB status", mongoose.connection.readyState);
+    debug("Seeing ✅", data);
+    // debug("B DB status", mongoose.connection.readyState);
     const submittedSupplier = new SupplierModel(data);
 
     try {
-        await submittedSupplier.save();
-        return Promise.resolve(submittedSupplier);
+        await submittedSupplier.validate();
     } catch (error) {
         debug("Request data", data);
         debug("Error saving 🚨", error);
@@ -42,15 +42,32 @@ const createSupplier = async(data) => {
 
         return Promise.reject(validationErrors);
     }
-    // debug("C DB status", mongoose.connection.readyState);
-    // return submittedSupplier.save()
-    //     .then(res => {
-    //         debug("Save ✅", res);
-    //         return res;
-    //     }).catch(error => {
-    //         debug("Error saving 🚨", error);
-    //         return error.errors;
-    //     });
+
+    const mongoUri = process.env.MONGO_URI;
+    mongoose.Promise = Promise;
+
+    mongoose.connect(mongoUri)
+    .then(async () => {
+        debug("connected and creating");
+        const newSup = new SupplierModel(data);
+        const result = await newSup.save();
+            // .then(res => {
+            //     debug("Save ✅", res);
+            //     return res;
+            // }).catch(error => {
+            //     debug("Error saving 🚨", error);
+            //     return error.errors;
+            // });
+
+        debug("Finished", result);
+        // await mongoose.connection.close();
+        // return newSup;
+    })
+        .then(async() => {
+            mongoose.connection.close();
+        });
+
+    return data;
 };
 
 const updateSupplierById = async(id, data) => {
