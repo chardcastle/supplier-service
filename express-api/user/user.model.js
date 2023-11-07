@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
+import _ from "lodash";
 import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         unique: true,
@@ -13,8 +14,28 @@ const userSchema = new mongoose.Schema({
     },
 });
 
+UserSchema.statics = {
+    /**
+     * @param {string} username
+     * @param {string} password
+     * @returns {object}
+     */
+    validateLoginData({ username, password }) {
+        let errors = {};
+        !username && (errors.username = "Username is required.");
+        !password && (errors.password = "Password is required.");
+
+        if (_.isEmpty(errors)) {
+            return { valid: true, errors: null };
+        }
+
+        return { valid: false, errors };
+    },
+}
+
+//
 // Pre-save middleware to hash the user's password before saving
-userSchema.pre("save", function (next) {
+UserSchema.pre("save", function (next) {
     const user = this;
     if (!user.isModified("password")) return next();
 
@@ -30,14 +51,6 @@ userSchema.pre("save", function (next) {
     });
 });
 
-// Method to compare passwords for authentication
-userSchema.methods.comparePassword = function (candidatePassword, callback) {
-    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-        if (err) return callback(err);
-        callback(null, isMatch);
-    });
-};
-
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", UserSchema);
 
 export default User;
