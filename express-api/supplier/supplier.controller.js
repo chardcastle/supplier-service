@@ -1,6 +1,7 @@
 import SupplierModel, { SupplierSchema } from "./supplier.model.js";
-import Debug from "debug";
 import mongoose from "mongoose";
+import { formattedValidationErrors } from "../helpers/apiResponses.js";
+import Debug from "debug";
 const debug = Debug("ctl");
 
 const getSuppliers = async () => {
@@ -25,18 +26,7 @@ const createSupplier = async(data) => {
 
         return data;
     } catch (error) {
-        const { errors } = error;
-
-        const validationErrors = [].concat(Object.keys(errors)).map((key) => {
-            const errorObj = error.errors[key];
-            return {
-                id: key,
-                field: key,
-                message: errorObj.message,
-            };
-        });
-
-        return Promise.reject(validationErrors);
+        return Promise.reject(formattedValidationErrors(error));
     }
 };
 

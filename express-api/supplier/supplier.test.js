@@ -1,9 +1,8 @@
 import { jest } from "@jest/globals";
-import { MongoClient } from "mongodb";
 import express from "express";
 const app = express();
 import request from "supertest";
-import SupplierModel, {SupplierSchema} from "./supplier.model";
+import SupplierModel from "./supplier.model";
 import supplierRoutes from "./supplier.routes";
 import { apiError, apiSuccess, normaliseItemsById } from "../helpers/apiResponses.js";
 import mongoose from "mongoose";
@@ -63,6 +62,19 @@ describe("GET /test-route/list", () => {
         expect(status).toBe(200);
         expect(findSpy).toHaveBeenCalledTimes(1);
     });
+
+    it("should fail gracefully", async() => {
+        findSpy.mockImplementation(() => ([]));
+
+        const { status, body } = await request(app)
+            .get("/test-route/list")
+            .set("Accept", "application/json")
+            .expect("content-type", /json/);
+
+        expect(body).toEqual(apiSuccess(200, {}));
+        expect(status).toBe(200);
+        expect(findSpy).toHaveBeenCalledTimes(1);
+    });
 });
 
 describe("GET /test-route/view/:id", () => {
@@ -107,23 +119,6 @@ describe("GET /test-route/view/:id", () => {
 });
 
 describe("POST /test-route/create", () => {
-    let createSpy;
-
-    beforeEach(() => {
-        // TODO Provide good spy
-        // createSpy = jest.spyOn(SupplierSchema, "pre")
-        //     .mockImplementationOnce(function (event, middleware) {
-        //         const continueProcessing =  jest.fn(next => next());
-        //         if (event !== 'save') {
-        //             middleware.call(this, continueProcessing);
-        //         }
-        //     });
-    });
-
-    afterEach(() => {
-        // createSpy.mockRestore();
-    });
-
     it ("should complete successfully", async () => {
         const newSupplier = {
             Name: "Test person",
@@ -166,26 +161,51 @@ describe("POST /test-route/create", () => {
 });
 
 describe("PUT /test-route/update/:id", () => {
+    let findByIdAndUpdateSpy;
+    const supplierAmends = {
+        Name: "Amended supplier name",
+    };
+
+    beforeEach(() => {
+        findByIdAndUpdateSpy = jest.spyOn(SupplierModel, "findByIdAndUpdate");
+    });
+
+    afterEach(() => {
+        findByIdAndUpdateSpy.mockRestore();
+    });
+
     it("should complete successfully", async () => {
-        const findByIdAndUpdateSpy = jest.spyOn(SupplierModel, "findByIdAndUpdate")
-            .mockImplementation(() => ({ _id: 1 }));
+        findByIdAndUpdateSpy.mockResolvedValue({ _id: 1 });
 
-        const supplierAmends = {
-            Name: "Amended supplier name",
-        };
+        const { status, body: { data: { message } } } = await request(app)
+            .put("/test-route/update/1")
+            .send(supplierAmends)
+            .expect("Content-Type", /json/);
 
-        const { id } = 1;
-        const { status } = await request(app)
-            .put(`/test-route/update/${id}`)
-            .send(supplierAmends);
+        expect(status).toBe(200);
+        expect(findByIdAndUpdateSpy).toHaveBeenCalledTimes(1);
+        expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(String(1), supplierAmends);
+        expect(message).toEqual("Updated supplier (id): 1");
+    });
 
-        expect(status).toBe(204);
+    it("should fail gracefully", async () => {
+        findByIdAndUpdateSpy.mockRejectedValue({});
+
+        const { status, body: { data: { message } } } = await request(app)
+            .put("/test-route/update/1")
+            .send(supplierAmends)
+            .expect("Content-Type", /json/);
+
+        expect(status).toBe(422);
+        expect(findByIdAndUpdateSpy).toHaveBeenCalledTimes(1);
+        expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(String(1), supplierAmends);
+        expect(message).toEqual("Unable to update supplier (id): 1");
     });
 });
 
 describe("DELETE supplier/:id", () => {
     beforeAll(() => {
-        jest.useFakeTimers("modern");
+        jest.useFakeTimers();
         jest.setSystemTime(new Date("2023-10-31"));
     });
 
@@ -207,7 +227,7 @@ describe("DELETE supplier/:id", () => {
             { DeletedOn: new Date("2023-10-31").getTime() }
         );
 
-        // findByIdAndUpdateSpy.mockRestore();
+        findByIdAndUpdateSpy.mockRestore();
         expect(status).toBe(202);
     });
 });

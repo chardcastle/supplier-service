@@ -1,10 +1,6 @@
-import express from "express";
+import { Router } from "express";
 import Debug from "debug";
-const router = express.Router();
-import mongoose from "mongoose";
-
-const debug = Debug("ctl");
-
+import { apiSuccess, apiError, normaliseItemsById } from "../helpers/apiResponses.js";
 import {
     getSuppliers,
     getSupplierById,
@@ -12,13 +8,14 @@ import {
     updateSupplierById,
     destroyById,
 } from "./supplier.controller.js";
-import { apiSuccess, apiError, normaliseItemsById } from "../helpers/apiResponses.js";
+
+const router = Router();
+const debug = Debug("ctl");
 
 router.get("/list", async (req, res) => {
-    debug("1 DB status", mongoose.connection.readyState);
-    const suppliers =  await getSuppliers();
-    debug("3 DB status", mongoose.connection.readyState);
-    res.status(200).json(apiSuccess(200, normaliseItemsById(suppliers)));
+    const suppliers = await getSuppliers();
+
+    return res.status(200).json(apiSuccess(200, normaliseItemsById(suppliers)));
 });
 
 router.get("/view/:id", async (req, res) => {
@@ -37,33 +34,37 @@ router.get("/view/:id", async (req, res) => {
 });
 
 router.get("/create", (req, res) => {
-    res.render("supplier-create");
+    return res.render("supplier-create");
 });
 
 router.post("/create",async (req, res) => {
     const supplierData = { ...req.body, CreatedOn: Date.now() };
-    debug("Data is ", supplierData);
 
     try {
         const { Name } = await createSupplier(supplierData);
 
         return res.status(201).json(apiSuccess(201, { message: `Created supplier: ${Name}` }));
     } catch (errors) {
-        return res.status(422).json(apiError(422, { message: "Oops", errors: normaliseItemsById(errors) }));
+        return res.status(422).json(apiError(422, {
+            message: "Oops",
+            errors: normaliseItemsById(errors)
+        }));
     }
 });
 
-router.put("/update/:id",async (req, res) => {
+router.put("/update/:id", async (req, res) => {
     const { id } = req.params;
 
-    if (req.body === undefined) {
-        res.status(422).end();
-    }
+    try {
+        await updateSupplierById(id, req.body);
 
-    const supplierData = { ...req.body, CreatedOn: Date.now() };
-    const { Name } = supplierData;
-    await updateSupplierById(id, supplierData);
-    res.status(204).send(`Created supplier: ${Name}`);
+        return res.status(200).json(apiSuccess(200, { message: `Updated supplier (id): ${id}` }));
+    } catch (errors) {
+        return res.status(422).json(apiError(422, {
+            message: `Unable to update supplier (id): ${id}`,
+            errors: normaliseItemsById(errors)
+        }));
+    }
 });
 
 router.delete("/view/:id", async (req, res) => {
@@ -71,7 +72,7 @@ router.delete("/view/:id", async (req, res) => {
     await destroyById(id);
 
     const softlyDeletedHTTPResponseCode = 202;
-    res.status(softlyDeletedHTTPResponseCode).end();
+    return res.status(softlyDeletedHTTPResponseCode).end();
 });
 
 export default router;

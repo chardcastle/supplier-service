@@ -24,4 +24,17 @@ const normaliseItemsById = (dataObjectsById) => {
     return normalised;
 }
 
-export { apiSuccess, apiError, normaliseItemsById };
+const formattedValidationErrors = (validationErrors) => {
+    const { errors } = validationErrors;
+
+    return [].concat(Object.keys(errors)).map((key) => {
+        const errorObj = validationErrors.errors[key];
+        return {
+            id: key,
+            field: key,
+            message: errorObj.message,
+        };
+    });
+}
+
+export { apiSuccess, apiError, normaliseItemsById, formattedValidationErrors };
