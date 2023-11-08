@@ -27,10 +27,8 @@ export const login = async (req, res) => {
             return res.status(401).json(apiError(401, { msg: "Username or password doesn't match." }));
         }
 
-        debug("Creating JWT token");
-        const jwtPayload = { id, username };
+        const jwtPayload = { id: String(id), username };
 
-        // Sign Token with payload
         jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: 36000 }, (err, token) => {
             if (err) {
                 return res
@@ -38,7 +36,7 @@ export const login = async (req, res) => {
                     .json(apiError(400, { msg: "Something went wrong, try again later." }));
             }
 
-            debug(`Returning token for successful request: ${token}`);
+            debug(`Returning signed token for successful auth request: ${token}`);
             return res.status(200).json(apiSuccess(200, { token: `Bearer ${token}` }));
         });
     } catch (err) {

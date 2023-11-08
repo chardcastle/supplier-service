@@ -1,15 +1,20 @@
-import { jest } from "@jest/globals";
 import express from "express";
-const app = express();
 import request from "supertest";
 import authRoutes from "./auth.routes.js";
-import { apiError, apiSuccess, normaliseItemsById } from "../helpers/apiResponses.js";
 import mongoose from "mongoose";
 import Debug from "debug";
+import passport from "passport";
+import passportConfig from "../config/passport.js";
+
+const app = express();
 const debug = Debug("clt");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(passport.initialize());
+passportConfig(passport);
+
 app.use("/test-route", authRoutes);
 
 beforeAll(async () => {
@@ -53,9 +58,44 @@ describe("User authentication", () => {
 });
 
 describe("Authenticated routes", () => {
+    it("should grant access to public URL", async () => {
+        const { status, body: { data: { message } } } = await request(app)
+            .get("/test-route/public")
+            .expect("content-type", /json/);
 
+        expect(status).toEqual(200);
+        expect(message).toEqual("Hello world!");
+    });
+
+    it("should deny access to private endpoint without a token", async () => {
+        const { status, body: { data: { message } } } = await request(app)
+            .get("/test-route/private")
+            .expect("content-type", /json/);
+
+        expect(status).toEqual(400);
+        expect(message).toEqual("An authentication token was not found in your request");
+    });
+
+    it("should not accept any old string as auth token to private endpoint", async () => {
+        const { status, body: { data: { message } } } = await request(app)
+            .get("/test-route/private")
+            .set('Authorization', Buffer.from("Not a real token").toString('base64'))
+            .expect("content-type", /json/);
+
+        expect(status).toEqual(401);
+        expect(message).toEqual("Authentication failed");
+    });
+
+    it("should grant access to private endpoint", async () => {
+        const { body: { data: { token } } } = await request(app)
+            .post("/test-route/login")
+            .send({ username: "foo", password: "supersecure"})
+
+        const { status, body: { data: { message } } } = await request(app)
+            .get("/test-route/private")
+            .set('Authorization', `${token}`);
+
+        expect(message).toEqual("This is a private welcome message from an authenticated request");
+        expect(status).toEqual(200);
+    });
 });
-// it can grant authentication to a user
-// it can deny authentication to a user
-
-
