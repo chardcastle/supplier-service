@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import User from "../user/user.model.js";
 import { apiSuccess, apiError } from "../helpers/apiResponses.js";
 import Debug from "debug";

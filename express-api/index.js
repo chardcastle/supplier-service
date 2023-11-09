@@ -6,7 +6,7 @@ import cors from "cors";
 import is404 from "./middlewear/is-404.js";
 import Debug from "debug";
 import supplierRoutes from "./supplier/supplier.routes.js";
-// import authRoutes from "./auth/auth.routes.js";
+import authRoutes from "./auth/auth.routes.js";
 import mongoose from "mongoose";
 import passport from "passport";
 import passportConfig from "./config/passport.js";
@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
     res.render("home");
 });
 
-// app.use("/auth", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/suppliers", supplierRoutes);
 
 app.use((req, res) => {

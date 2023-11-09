@@ -1,5 +1,4 @@
 {
-    "preset": "@shelf/jest-mongodb",
     "testEnvironment": "node",
     "transformIgnorePatterns": [
         "/node_modules/*"

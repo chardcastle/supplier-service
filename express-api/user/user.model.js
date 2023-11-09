@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import _ from "lodash";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const UserSchema = new mongoose.Schema({
     username: {

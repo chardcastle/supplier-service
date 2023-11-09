@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login } from "./auth.controller";
+import { login } from "./auth.controller.js";
 import { apiSuccess } from "../helpers/apiResponses.js";
 import isAuth from "../middlewear/is-auth.js";
 
