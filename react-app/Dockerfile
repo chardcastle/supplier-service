@@ -5,9 +5,7 @@ FROM node:lts
 WORKDIR /opt/project
 
 # Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-COPY src/ ./
-COPY public/ ./
+COPY . .
 
 # Install project dependencies
 RUN npm install
@@ -16,4 +14,4 @@ RUN npm install
 EXPOSE 3000
 
 # Define the command to run your app using the production build
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]

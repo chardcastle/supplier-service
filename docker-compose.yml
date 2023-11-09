@@ -44,9 +44,6 @@ services:
     volumes:
       - ./react-app:/opt/project # Mount the app code (local:container)
       - /opt/project/node_modules/
-    environment:
-      PUBLIC_URL: http://localhost:3000
-      NODE_ENV: dev
 
 volumes:
   mongodb_data:
