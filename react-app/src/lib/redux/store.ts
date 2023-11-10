@@ -15,6 +15,7 @@ export const reduxStore = configureStore({
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware().concat(middleware)
   },
+  devTools: process.env.NODE_ENV !== 'production', // Enable Redux DevTools only in development
 })
 export const useDispatch = () => useReduxDispatch<ReduxDispatch>()
 export const useSelector: TypedUseSelectorHook<ReduxState> = useReduxSelector

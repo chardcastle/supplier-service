@@ -45,7 +45,18 @@ describe("User authentication", () => {
         });
     });
 
-    it("should complete login with valid submitted data to get a JWT token", async () => {
+    it("should gracefully handle incorrect username submission", async () => {
+        const { status, body:  { data: { message } } } = await request(app)
+            .post("/test-route/login")
+            .set("Accept", "application/json")
+            .send({ username: "unknown", password: "wrong" })
+            .expect("content-type", /json/);
+
+        expect(status).toEqual(401);
+        expect(message).toEqual("Incorrect username and or password combination");
+    });
+
+    it ("should complete login with valid submitted data to get a JWT token", async () => {
         const { status, body: { data: { token } } } = await request(app)
             .post("/test-route/login")
             .set("Accept", "application/json")

@@ -5,6 +5,8 @@ import { apiSuccess, apiError } from "../helpers/apiResponses.js";
 import Debug from "debug";
 const debug = Debug("ctl");
 
+const invalidCredentialsMessage = "Incorrect username and or password combination";
+
 export const login = async (req, res) => {
     try {
         const { valid, errors } = User.validateLoginData(req.body);
@@ -14,17 +16,19 @@ export const login = async (req, res) => {
         }
 
         const { username: submittedUsername, password: submittedPassword } = req.body;
+        const matchedUser = await User.findOne({ username: submittedUsername });
 
-        const { _id: id, username, password } = await User.findOne({ username: submittedUsername });
-        if (!id) {
+        if (null === matchedUser) {
             debug("Unable to find user by given username");
-            return res.status(404).json(apiError(404, { username: "Username doesn't exist in database." }));
+            return res.status(401).json(apiError(401, { message: invalidCredentialsMessage }));
         }
+
+        const { _id: id, username, password } = matchedUser;
 
         const isMatch = await bcrypt.compare(submittedPassword, password);
         if (!isMatch) {
             debug("Password mismatch");
-            return res.status(401).json(apiError(401, { msg: "Username or password doesn't match." }));
+            return res.status(401).json(apiError(401, { message: invalidCredentialsMessage }));
         }
 
         const jwtPayload = { id: String(id), username };
@@ -40,6 +44,6 @@ export const login = async (req, res) => {
             return res.status(200).json(apiSuccess(200, { token: `Bearer ${token}` }));
         });
     } catch (err) {
-        return res.status(500).json(apiError(500, { err }));
+        return res.status(500).json(apiError(500, { message: err.message }));
     }
 };

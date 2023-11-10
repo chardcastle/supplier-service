@@ -37,18 +37,19 @@ UserSchema.statics = {
 // Pre-save middleware to hash the user's password before saving
 UserSchema.pre("save", function (next) {
     const user = this;
-    if (!user.isModified("password")) return next();
 
-    // Generate a salt and hash the password with 10 rounds of salt
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) return next(err);
+    if (!user.isModified("password")) {
+        return next();
+    }
 
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err) return next(err);
+    const saltRounds = 10;
+    bcrypt
+        .hash(user.password, saltRounds)
+        .then(hash => {
             user.password = hash;
             next();
-        });
-    });
+        })
+        .catch(err => next(err.message));
 });
 
 const User = mongoose.model("User", UserSchema);

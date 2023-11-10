@@ -1,10 +1,11 @@
 import { Counter } from "@/app/components/Counter/Counter";
 
-export default function Page() {
-
+const Page = () => {
     return (
         <>
             <Counter />
         </>
     )
 }
+
+export default Page;
