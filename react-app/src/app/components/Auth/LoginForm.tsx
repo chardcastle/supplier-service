@@ -6,7 +6,7 @@ import {redirect, RedirectType} from 'next/navigation'
 
 /* Instruments */
 import {
-    authenticateAsync,
+    authenticateAsync, selectAll,
     selectErrorMessage,
     selectIsAuthenticated,
     useDispatch,
@@ -16,17 +16,22 @@ import {
 export const LoginForm = () => {
     const isAuthenticated = useSelector(selectIsAuthenticated);
     const errorMessage = useSelector(selectErrorMessage);
+    const debug = useSelector(selectAll);
     const dispatch = useDispatch();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
     useEffect(() => {
-        redirect('/counter', 'replace' as RedirectType)
+        if (isAuthenticated) {
+            redirect('/counter', 'replace' as RedirectType)
+        }
     }, [isAuthenticated]);
 
     useEffect(() => {
-        setError(String(errorMessage));
+        if (errorMessage) {
+            setError(String(errorMessage));
+        }
     }, [errorMessage]);
 
     const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +56,12 @@ export const LoginForm = () => {
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <img className="mx-auto h-20 w-auto" src="https://pic.onlinewebfonts.com/thumbnails/icons_218394.svg" alt="Supplier" />                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
             </div>
+
+            {debug && (
+                <div className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                    <span className="font-medium">Debug:</span> {JSON.stringify(debug)}
+                </div>
+            )}
 
             {error && (
                 <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">

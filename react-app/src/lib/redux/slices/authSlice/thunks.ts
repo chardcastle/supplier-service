@@ -10,8 +10,6 @@ export interface Credentials {
 export const authenticateAsync = createAppAsyncThunk(
     'auth/authenticate',
     async (credentials: Credentials) => {
-        const response = await postCredentials(credentials);
-
-        return response.data;
+        return postCredentials(credentials);
     }
 )
