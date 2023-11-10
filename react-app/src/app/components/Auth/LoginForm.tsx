@@ -2,7 +2,7 @@
 
 /* Core */
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
-import {redirect, RedirectType} from 'next/navigation'
+import { redirect, RedirectType } from 'next/navigation'
 
 /* Instruments */
 import {
@@ -52,24 +52,24 @@ export const LoginForm = () => {
     };
 
     return (
-        <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="flex min-h-full flex-col justify-center items-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img className="mx-auto h-20 w-auto" src="https://pic.onlinewebfonts.com/thumbnails/icons_218394.svg" alt="Supplier" />                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
+                <img className="sm:mx-auto" width="80px" height="80px" src="/supplier-service-logo.svg" alt="Supplier" />
+                <h2 className="mt-10 text-center text-2xl leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
             </div>
 
-            {debug && (
-                <div className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
-                    <span className="font-medium">Debug:</span> {JSON.stringify(debug)}
-                </div>
-            )}
-
-            {error && (
-                <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-                    <span className="font-medium">Oops!</span> {error}
-                </div>
-            )}
-
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                {debug && false && (
+                    <div className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                        <span className="font-medium">Debug:</span> {JSON.stringify(debug)}
+                    </div>
+                )}
+
+                {error && (
+                    <div className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                        <span className="font-medium">Oops!</span> {error}
+                    </div>
+                )}
                 <form className="space-y-6" onSubmit={handleSubmit} action="#" method="POST">
                     <div>
                         <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">Username</label>
@@ -78,28 +78,31 @@ export const LoginForm = () => {
                                    name="username"
                                    value={username}
                                    onChange={handleUsernameChange}
-                                   type="username" required className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                   placeholder="Enter your username"
+                                   type="username" required className="p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" />
                         </div>
                     </div>
 
                     <div>
                         <div className="flex items-center justify-between">
                             <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">Password</label>
-                            <div className="text-sm">
-                                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-                            </div>
+                            {/*<div className="text-sm">*/}
+                            {/*    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>*/}
+                            {/*</div>*/}
                         </div>
                         <div className="mt-2">
                             <input id="password"
                                    name="password"
                                    value={password}
                                    onChange={handlePasswordChange}
-                                   type="password" required className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                   placeholder="Enter your password"
+
+                                   type="password" required className="p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" />
                         </div>
                     </div>
 
                     <div>
-                        <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
+                        <button type="submit" className="flex w-full justify-center rounded-md bg-orange-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">Sign in</button>
                     </div>
                 </form>
             </div>

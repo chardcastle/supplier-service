@@ -1,19 +1,46 @@
-import React from 'react';
+import React, {ReactComponentElement, useEffect} from 'react'
+import { redirect, RedirectType, usePathname } from 'next/navigation'
+import Link from 'next/link';
 
 /* Instruments */
 import {
     useDispatch,
     authSlice,
 } from '@/lib/redux'
+import useAuth from "@/lib/hooks/useAuth";
+
+interface NavItemProps {
+    href: string,
+    isActive: boolean,
+    children: React.ReactNode[] | string
+}
+
+const NavItem = ({ href, isActive, children }: NavItemProps) => {
+    const navItemClasses  = ['hover:text-blue-200', 'hover:text-black-500', 'focus:text-black-800'];
+
+    return (
+        <Link href={href} className={`${navItemClasses.join(' ')} ${isActive ? 'text-blue-700' : 'text-grey-800'}`}>
+            {children}
+        </Link>
+    )
+}
+
 
 export const HeaderNavBar = () => {
+    const pathname = usePathname();
     const dispatch = useDispatch();
+    const { isAuthenticated } = useAuth();
 
-    const handleLogout = (event: React.MouseEvent<HTMLElement>) => {
+    const handleLogout = async (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        console.log("Dew it!!")
         dispatch(authSlice.actions.logoutAsync());
     };
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            redirect('/', 'replace' as RedirectType);
+        }
+    }, [isAuthenticated]);
 
     return (
         <nav className="bg-white border-gray-200 dark:bg-gray-900">
@@ -38,10 +65,22 @@ export const HeaderNavBar = () => {
                 <div className="hidden w-full md:block md:w-auto" id="navbar-default">
                     <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
                         <li>
-                            <a href="#" className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</a>
+                            <NavItem href="/" isActive={false}>
+                                Home
+                            </NavItem>
                         </li>
                         <li>
-                            <a href="#" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About</a>
+                            <a href="#" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Not used</a>
+                        </li>
+                        <li>
+                            <NavItem href="/about" isActive={pathname === '/about'}>
+                                About
+                            </NavItem>
+                        </li>
+                        <li>
+                            <NavItem href="/suppliers" isActive={pathname === '/contact'}>
+                                Suppliers
+                            </NavItem>
                         </li>
                         <li>
                             <a href="#" onClick={handleLogout} className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Logout</a>

@@ -14,21 +14,15 @@ import {
 } from '@/lib/redux'
 import { HeaderNavBar } from "@/app/components/Navigation/HeaderNavBar"
 import styles from './counter.module.css'
-import useAuth from "@/lib/hooks/useAuth";
 
 export const Counter = () => {
     const dispatch = useDispatch()
     const count = useSelector(selectCount)
     const [incrementAmount, setIncrementAmount] = useState(2)
-    const { isAuthenticated } = useAuth();
 
     return (
         <div>
             <HeaderNavBar />
-            <div className={styles.row}>
-                {isAuthenticated && (<p>Welcome user!</p>)}
-                {!isAuthenticated && (<p>Welcome guest.</p>)}
-            </div>
 
             <div className={styles.row}>
                 <button

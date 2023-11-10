@@ -17,6 +17,9 @@ const verifyJwt = async (token: string): Promise<JWTPayload | null> => {
         return payload;
     } catch (error) {
         console.error('Token verification failed:', error)
+        // if (error instanceof JWTExpired) {
+        //     console.error('It is expired!');
+        // }
 
         return null;
     }

@@ -32,6 +32,7 @@ export const authSlice = createSlice({
     reducers: {
         logoutAsync: (state) => {
             state.isAuthenticated = false
+            localStorage.removeItem('token')
         },
     },
     extraReducers: (builder) => {
@@ -41,13 +42,13 @@ export const authSlice = createSlice({
             })
             .addCase(authenticateAsync.rejected, (state, action) => {
                 state.status = 'loading'
-                const { message } = { message: null, ...action };
-                state.errorMessage = message;
+                const { message } = { message: null, ...action }
+                state.errorMessage = message
             })
             .addCase(authenticateAsync.fulfilled, (state, action) => {
                 state.status = 'idle'
                 const payload = action.payload as ApiSuccess
-                console.log("Payload", payload);
+                console.log("Payload", payload)
                 const defaults = { data: { token: undefined, message: undefined } }
                 const { success, data: { token, message }} = { ...defaults, ...payload };
                 console.log("Response", { success, token, message });
