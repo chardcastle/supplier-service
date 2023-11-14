@@ -40,10 +40,10 @@ describe("GET /test-route/list", () => {
     });
 
     it("should complete successfully", async() => {
-        findSpy.mockImplementation(() => ([
+        findSpy.mockResolvedValue([
             { id: 1, name: "Mocked supplier 1" },
             { id: 2, name: "Mocked supplier 2" },
-        ]));
+        ]);
 
         const { status, body } = await request(app)
             .get("/test-route/list")
@@ -64,7 +64,7 @@ describe("GET /test-route/list", () => {
     });
 
     it("should fail gracefully", async() => {
-        findSpy.mockImplementation(() => ([]));
+        findSpy.mockResolvedValue([]);
 
         const { status, body } = await request(app)
             .get("/test-route/list")
@@ -89,7 +89,7 @@ describe("GET /test-route/view/:id", () => {
     });
 
     it("should complete successfully", async() => {
-        findByIdSpy.mockImplementation(() => ({ id: 1, name: "Mocked supplier 1" }));
+        findByIdSpy.mockResolvedValue({ id: 1, name: "Mocked supplier 1" });
 
         const { status, body } = await request(app)
             .get(`/test-route/view/1`)
@@ -102,18 +102,18 @@ describe("GET /test-route/view/:id", () => {
         expect(findByIdSpy).toHaveBeenCalledTimes(1);
     });
 
-    it("should fail gracefully use apiError if not found", async () => {
-        findByIdSpy.mockImplementation(() => null);
+    it("should fail gracefully use apiError when not found", async () => {
+        findByIdSpy.mockRejectedValue(new Error("Didn't find"));
 
+        const headlessId = new mongoose.Types.ObjectId();
         const { status, body } = await request(app)
-            .get("/test-route/view/999")
+            .get(`/test-route/view/${headlessId}`)
             .set("Accept", "application/json")
             .expect("content-type", /json/);
 
-        expect(findByIdSpy).toHaveBeenCalledWith(String(999));
+        expect(body).toEqual(apiError(404, { message: `Didn't find with _id: ${headlessId}` }));
+        expect(findByIdSpy).toHaveBeenCalledWith(String(headlessId));
         expect(findByIdSpy).toHaveBeenCalledTimes(1);
-
-        expect(body).toEqual(apiError(404, { message: "Unable to find supplier with id 999" }));
         expect(status).toBe(404);
     });
 });

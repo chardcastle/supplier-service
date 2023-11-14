@@ -29,6 +29,16 @@ export const SupplierSchema = new mongoose.Schema({
     },
 });
 
+// SupplierSchema.pre('findOne', (next) => {
+//     return next(new Error("error is hererererere"))
+// });
+
+SupplierSchema.post('findOne', (doc) => {
+    if (null === doc) {
+        throw new Error(`Unable to find supplier`);
+    }
+});
+
 const SupplierModel = mongoose.model("Supplier", SupplierSchema);
 
 export default SupplierModel;
