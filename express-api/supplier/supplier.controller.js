@@ -4,13 +4,13 @@ import {apiError, apiSuccess, formattedValidationErrors, normaliseItemsById} fro
 import Debug from "debug";
 const debug = Debug("ctl");
 
-const list = async (req, res) => {
+const getList = async (req, res) => {
     const suppliers = await SupplierModel.find({ DeletedOn: null });
 
     return res.status(200).json(apiSuccess(200, normaliseItemsById(suppliers)));
 };
 
-const viewById = async (req, res) => {
+const getViewById = async (req, res) => {
     const { id } = req.params;
 
     debug("Searching for", id)
@@ -30,6 +30,21 @@ const getCreateForm = async (req, res) => {
     return res.render("supplier-create");
 }
 
+const postCreate = async (req, res) => {
+    const supplierData = { ...req.body, CreatedOn: Date.now() };
+
+    try {
+        const { Name } = await createSupplier(supplierData);
+
+        return res.status(201).json(apiSuccess(201, { message: `Created supplier: ${Name}` }));
+    } catch (errors) {
+        return res.status(422).json(apiError(422, {
+            message: "Oops",
+            errors: normaliseItemsById(errors)
+        }));
+    }
+}
+
 const createSupplier = async(data) => {
     const NewSupplier = mongoose.connection.model("Supplier", SupplierSchema);
 
@@ -43,27 +58,33 @@ const createSupplier = async(data) => {
     }
 };
 
-const updateSupplierById = async(id, data) => {
+const putUpdate = async (req, res) => {
+    const { body, params: { id } } = req;
+    debug("req", { id, body })
     try {
-        const supplier = await SupplierModel.findByIdAndUpdate(id, data);
-        debug("Updated supplier with", { supplier, id });
-
+        const supplier = await SupplierModel.findByIdAndUpdate(id, body);
         if (!supplier) {
             debug("Supplier not found");
             return null;
         }
-        debug("Updated supplier:", supplier);
+        debug("Updated supplier with", { supplier, id });
 
-        return supplier;
-    } catch (error) {
-        debug("Error updating user:", error);
-
-        throw error;
+        return res.status(200).json(apiSuccess(200, { message: `Updated supplier (id): ${id}` }));
+    } catch (errors) {
+        return res.status(422).json(apiError(422, {
+            message: `Unable to update supplier (id): ${id}`,
+            errors: normaliseItemsById(errors)
+        }));
     }
-};
+}
 
-const destroyById = async(id) => {
-    return updateSupplierById(id, { DeletedOn: Date.now() });
-};
+const deleteEntityId = async (req, res) => {
+    const { id } = req.params;
 
-export { list, viewById, getCreateForm, createSupplier, updateSupplierById, destroyById };
+    await SupplierModel.findByIdAndUpdate(id, { DeletedOn: Date.now() });
+
+    const softlyDeletedHTTPResponseCode = 202;
+    return res.status(softlyDeletedHTTPResponseCode).end();
+}
+
+export { getList, getViewById, getCreateForm, postCreate, createSupplier, putUpdate, deleteEntityId };
