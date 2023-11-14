@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export const SupplierSchema = new mongoose.Schema({
     SupplierId: {
         type: Number,
-        required:[true, "Provide a supplier ID (number)"],
+        required:[true, "Provide a suppliers ID (number)"],
     },
     Name: {
         type: String,

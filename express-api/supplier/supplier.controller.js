@@ -16,7 +16,7 @@ const getViewById = async (req, res) => {
     debug("Searching for", id)
     try {
         const supplier = await mongoose.model("Supplier", SupplierSchema).findById(id);
-        debug("success supplier", supplier);
+        debug("success suppliers", supplier);
 
         return res.status(200).json(apiSuccess(200, supplier ));
     } catch (err) {
@@ -27,7 +27,7 @@ const getViewById = async (req, res) => {
 }
 
 const getCreateForm = async (req, res) => {
-    return res.render("supplier-create");
+    return res.render("suppliers-create");
 }
 
 const postCreate = async (req, res) => {
@@ -42,7 +42,7 @@ const postCreate = async (req, res) => {
         return res.status(201).json(apiSuccess(201, { message: `Created supplier: ${Name}` }));
     } catch (errors) {
         return res.status(422).json(apiError(422, {
-            message: "Unable to create supplier",
+            message: "Unable to create suppliers",
             errors: normaliseItemsById(formattedValidationErrors(errors))
         }));
     }
@@ -57,7 +57,7 @@ const putUpdate = async (req, res) => {
             debug("Supplier not found");
             return null;
         }
-        debug("Updated supplier with", { supplier, id });
+        debug("Updated suppliers with", { supplier, id });
 
         return res.status(200).json(apiSuccess(200, { message: `Updated supplier (id): ${id}` }));
     } catch (errors) {

@@ -3,7 +3,7 @@ const SupplierRateModel = require("./supplierRate.model");
 const debug = require("debug")("ctl");
 
 const getSupplierRates = async () => {
-    debug("Fetching supplier rates");
+    debug("Fetching suppliers rates");
 
     const model = mongoose.model("SupplierRate");
     return model.find({});

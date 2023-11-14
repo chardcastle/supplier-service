@@ -14,7 +14,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: db_s3cur3p4sswd
       MONGO_INITDB_DATABASE: supplier_service
 
-  # Express.js API service to store supplier
+  # Express.js API service to store suppliers
   express-api:
     build:
       context: ./express-api
@@ -32,7 +32,7 @@ services:
       NODE_ENV: dev
       DEBUG: ctl
 
-  # React app to see supplier
+  # React app to see suppliers
   react-app:
     build:
       context: ./react-app

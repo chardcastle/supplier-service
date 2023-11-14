@@ -163,7 +163,7 @@ describe("POST /test-route/create", () => {
 describe("PUT /test-route/update/:id", () => {
     let findByIdAndUpdateSpy;
     const supplierAmends = {
-        Name: "Amended supplier name",
+        Name: "Amended suppliers name",
     };
 
     beforeEach(() => {
@@ -185,7 +185,7 @@ describe("PUT /test-route/update/:id", () => {
         expect(status).toBe(200);
         expect(findByIdAndUpdateSpy).toHaveBeenCalledTimes(1);
         expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(String(1), supplierAmends);
-        expect(message).toEqual("Updated supplier (id): 1");
+        expect(message).toEqual("Updated suppliers (id): 1");
     });
 
     it("should fail gracefully", async () => {
@@ -199,11 +199,11 @@ describe("PUT /test-route/update/:id", () => {
         expect(status).toBe(422);
         expect(findByIdAndUpdateSpy).toHaveBeenCalledTimes(1);
         expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(String(1), supplierAmends);
-        expect(message).toEqual("Unable to update supplier (id): 1");
+        expect(message).toEqual("Unable to update suppliers (id): 1");
     });
 });
 
-describe("DELETE supplier/:id", () => {
+describe("DELETE suppliers/:id", () => {
     beforeAll(() => {
         jest.useFakeTimers();
         jest.setSystemTime(new Date("2023-10-31"));
