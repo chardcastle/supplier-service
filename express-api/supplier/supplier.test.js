@@ -133,8 +133,8 @@ describe("POST /test-route/create", () => {
             .send(newSupplier)
             .expect("Content-Type", /json/);
 
-        expect(message).toEqual(`Created supplier: ${expectedName}`);
         expect(status).toBe(201);
+        expect(message).toEqual(`Created supplier: ${expectedName}`);
     });
 
     it ("should fail gracefully", async () => {
@@ -149,6 +149,7 @@ describe("POST /test-route/create", () => {
             .send(incompletePayload)
             .expect("Content-Type", /json/);
 
+        expect(status).toBe(422);
         expect(errors).toEqual({
             Address: {
                 field: "Address",
@@ -156,7 +157,6 @@ describe("POST /test-route/create", () => {
                 message: "Address is missing"
             }
         });
-        expect(status).toBe(422);
     });
 });
 

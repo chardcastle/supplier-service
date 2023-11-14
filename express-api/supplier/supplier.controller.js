@@ -34,33 +34,23 @@ const postCreate = async (req, res) => {
     const supplierData = { ...req.body, CreatedOn: Date.now() };
 
     try {
-        const { Name } = await createSupplier(supplierData);
+        const NewSupplier = mongoose.connection.model("Supplier", SupplierSchema);
+        const supplier = new NewSupplier(supplierData);
+        await supplier.save()
 
+        const { Name } = supplier;
         return res.status(201).json(apiSuccess(201, { message: `Created supplier: ${Name}` }));
     } catch (errors) {
         return res.status(422).json(apiError(422, {
-            message: "Oops",
-            errors: normaliseItemsById(errors)
+            message: "Unable to create supplier",
+            errors: normaliseItemsById(formattedValidationErrors(errors))
         }));
     }
 }
 
-const createSupplier = async(data) => {
-    const NewSupplier = mongoose.connection.model("Supplier", SupplierSchema);
-
-    try {
-        const supplier = new NewSupplier(data);
-        await supplier.save();
-
-        return data;
-    } catch (error) {
-        return Promise.reject(formattedValidationErrors(error));
-    }
-};
-
 const putUpdate = async (req, res) => {
     const { body, params: { id } } = req;
-    debug("req", { id, body })
+
     try {
         const supplier = await SupplierModel.findByIdAndUpdate(id, body);
         if (!supplier) {
@@ -87,4 +77,4 @@ const deleteEntityId = async (req, res) => {
     return res.status(softlyDeletedHTTPResponseCode).end();
 }
 
-export { getList, getViewById, getCreateForm, postCreate, createSupplier, putUpdate, deleteEntityId };
+export { getList, getViewById, getCreateForm, postCreate, putUpdate, deleteEntityId };
