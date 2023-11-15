@@ -1,5 +1,4 @@
 import React from 'react';
-import { AppProps } from 'next/app';
 import { Providers } from "./providers";
 import { Providers as ReduxProviders } from '@/lib/providers'
 import { Inter } from 'next/font/google'

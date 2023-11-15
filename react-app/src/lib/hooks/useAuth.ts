@@ -32,7 +32,6 @@ const useAuth = () => {
             console.log("Token found in local storage");
             verifyJwt(token)
                 .then(() => {
-                    console.log("Set auth true");
                     setIsAuthenticated(true);
                 })
                 .catch(error => {

@@ -2,51 +2,65 @@ import {
     Table,
     Thead,
     Tbody,
-    Tfoot,
     Tr,
     Th,
     Td,
-    TableCaption,
     TableContainer,
 } from '@chakra-ui/react'
+import { format } from 'date-fns';
+import { useGetSuppliersListQuery } from "@/lib/redux/services/suppliersApi";
+import React from "react";
+
+interface Supplier {
+    _id: string;
+    SupplierId: number;
+    Name: string;
+    Address: string;
+    CreatedByUser: string;
+    CreatedOn: string;
+}
+
+interface SupplierData {
+    [key: string]: Supplier;
+}
+
+const SupplierRows = (props: {data: SupplierData }) => {
+    const { data } = props;
+    return (
+        <>
+            {data && Object.entries(data).map(([key, { SupplierId, Name, Address, CreatedOn }]) => (
+                <Tr key={key}>
+                    <Td>{SupplierId}</Td>
+                    <Td>{Name}</Td>
+                    <Td>{Address}</Td>
+                    <Td>{format(new Date(CreatedOn), "yyyy-MM-dd HH:mm:ss")}</Td>
+                </Tr>
+            ))}
+        </>
+    )
+}
 
 const List = () => {
+    const { data, isLoading } = useGetSuppliersListQuery();
+
+    // @ts-ignore
     return (
         <div className="container mx-auto mt-8 p-4">
             <div className="overflow-x-auto">
                 <TableContainer>
-                    <Table size='sm'>
+                    <Table variant='simple'>
                         <Thead>
                             <Tr>
-                                <Th>To convert</Th>
-                                <Th>into</Th>
-                                <Th isNumeric>multiply by</Th>
+                                <Th>Supplier ID</Th>
+                                <Th>Name</Th>
+                                <Th>Address</Th>
+                                <Th>Created on</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
-                            <Tr>
-                                <Td>inches</Td>
-                                <Td>millimetres (mm)</Td>
-                                <Td isNumeric>25.4</Td>
-                            </Tr>
-                            <Tr>
-                                <Td>feet</Td>
-                                <Td>centimetres (cm)</Td>
-                                <Td isNumeric>30.48</Td>
-                            </Tr>
-                            <Tr>
-                                <Td>yards</Td>
-                                <Td>metres (m)</Td>
-                                <Td isNumeric>0.91444</Td>
-                            </Tr>
-                        </Tbody>
-                        <Tfoot>
-                            <Tr>
-                                <Th>To convert</Th>
-                                <Th>into</Th>
-                                <Th isNumeric>multiply by</Th>
-                            </Tr>
-                        </Tfoot>
+                            {isLoading && (<Tr><Td colSpan={4}>Loading</Td></Tr>)}
+                            {data && (<SupplierRows data={data.data} />)}
+                       </Tbody>
                     </Table>
                 </TableContainer>
             </div>

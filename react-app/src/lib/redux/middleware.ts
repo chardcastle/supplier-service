@@ -1,5 +1,6 @@
 /* Core */
 import { createLogger } from 'redux-logger'
+import { suppliersApi } from "@/lib/redux/services/suppliersApi";
 
 const middleware = [
     createLogger({
@@ -15,6 +16,7 @@ const middleware = [
         },
         predicate: () => typeof window !== 'undefined',
     }),
+    suppliersApi.middleware,
 ]
 
 export { middleware }
