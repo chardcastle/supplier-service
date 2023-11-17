@@ -9,7 +9,8 @@ export interface CurrentUser {
 }
 
 interface LoginResponse {
-    token: string | undefined,
+    authToken: string | undefined,
+    refreshToken: string | undefined,
     message: string | undefined
 }
 
@@ -32,7 +33,8 @@ export const authSlice = createSlice({
     reducers: {
         logoutAsync: (state) => {
             state.isAuthenticated = false
-            localStorage.removeItem('token')
+            localStorage.removeItem('authToken')
+            localStorage.removeItem('refreshToken')
         },
     },
     extraReducers: (builder) => {
@@ -49,14 +51,16 @@ export const authSlice = createSlice({
                 state.status = 'idle'
                 const payload = action.payload as ApiSuccess
                 console.log("Payload", payload)
-                const defaults = { data: { token: undefined, message: undefined } }
-                const { success, data: { token, message }} = { ...defaults, ...payload };
-                console.log("Response", { success, token, message });
+                const defaults = { data: { authToken: undefined, refreshToken: undefined, message: undefined } }
+                const { success, data: { authToken, refreshToken, message }} = { ...defaults, ...payload };
+                console.log("Response", { success, authToken, message });
                 state.isAuthenticated = success
                 state.errorMessage = message || null
-                const authToken = token || false
                 if (authToken) {
-                    localStorage.setItem('token', authToken);
+                    localStorage.setItem('authToken', authToken);
+                }
+                if (refreshToken) {
+                    localStorage.setItem('refreshToken', refreshToken);
                 }
             })
     },

@@ -57,14 +57,15 @@ describe("User authentication", () => {
     });
 
     it ("should complete login with valid submitted data to get a JWT token", async () => {
-        const { status, body: { data: { token } } } = await request(app)
+        const { status, body: { data: { authToken, refreshToken } } } = await request(app)
             .post("/test-route/login")
             .set("Accept", "application/json")
             .send({ username: "foo", password: "supersecure"})
             .expect("content-type", /json/);
 
         expect(status).toEqual(200);
-        expect(token).toMatch(/Bearer (.*)/);
+        expect(authToken).toMatch(/Bearer (.*)/);
+        expect(refreshToken).toMatch(/Bearer (.*)/);
     });
 });
 
@@ -98,13 +99,13 @@ describe("Authenticated routes", () => {
     });
 
     it("should grant access to private endpoint", async () => {
-        const { body: { data: { token } } } = await request(app)
+        const { body: { data: { authToken } } } = await request(app)
             .post("/test-route/login")
             .send({ username: "foo", password: "supersecure"})
 
         const { status, body: { data: { message } } } = await request(app)
             .get("/test-route/private")
-            .set('Authorization', `${token}`);
+            .set('Authorization', `${authToken}`);
 
         expect(message).toEqual("This is a private welcome message from an authenticated request");
         expect(status).toEqual(200);

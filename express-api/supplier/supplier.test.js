@@ -185,7 +185,7 @@ describe("PUT /test-route/update/:id", () => {
         expect(status).toBe(200);
         expect(findByIdAndUpdateSpy).toHaveBeenCalledTimes(1);
         expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(String(1), supplierAmends);
-        expect(message).toEqual("Updated suppliers (id): 1");
+        expect(message).toEqual("Updated supplier (id): 1");
     });
 
     it("should fail gracefully", async () => {
@@ -199,7 +199,7 @@ describe("PUT /test-route/update/:id", () => {
         expect(status).toBe(422);
         expect(findByIdAndUpdateSpy).toHaveBeenCalledTimes(1);
         expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(String(1), supplierAmends);
-        expect(message).toEqual("Unable to update suppliers (id): 1");
+        expect(message).toEqual("Unable to update supplier (id): 1");
     });
 });
 

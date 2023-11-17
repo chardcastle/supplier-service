@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSelector, selectIsAuthenticated, selectAuthToken} from '@/lib/redux'
+import { useSelector, selectIsAuthenticated } from '@/lib/redux'
 import verifyJwt from "@/lib/verifyJwt";
 
 const useAuth = () => {
@@ -26,7 +26,7 @@ const useAuth = () => {
 
     const checkAuthentication = () => {
         // Get the token from wherever you store it (e.g., cookies, local storage)
-        const token = localStorage.getItem('token'); // Assuming it's stored in local storage
+        const token = localStorage.getItem('authToken'); // Assuming it's stored in local storage
 
         if (token) {
             console.log("Token found in local storage");

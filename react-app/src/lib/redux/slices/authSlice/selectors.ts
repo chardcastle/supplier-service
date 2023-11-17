@@ -8,9 +8,3 @@ import type { CurrentUser} from "@/lib/redux";
 export const selectAll = (state: ReduxState) => state.auth
 export const selectErrorMessage = (state: ReduxState) => state.auth.errorMessage
 export const selectIsAuthenticated = (state: ReduxState) => state.auth.isAuthenticated
-export const selectAuthToken = (state: ReduxState) => {
-    const currentUser = state.auth.currentUser as CurrentUser;
-    const { token } = currentUser;
-
-    return token;
-}
