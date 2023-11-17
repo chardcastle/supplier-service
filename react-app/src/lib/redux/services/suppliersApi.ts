@@ -1,8 +1,24 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-interface Supplier {
-    id: string,
-    name: string
+export interface Supplier {
+    _id: string;
+    SupplierId: number;
+    Name: string;
+    Address: string;
+    CreatedByUser: string;
+    CreatedOn: string;
+}
+
+export interface SupplierData {
+    [key: string]: Supplier;
+}
+
+export interface SupplierResponseData {
+    data: SupplierData
+}
+
+const includeRefreshToken = (form: any) => {
+    return { ...form, refreshToken: localStorage.getItem('refreshToken') };
 }
 
 export const suppliersApi = createApi({
@@ -10,27 +26,27 @@ export const suppliersApi = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: 'http://localhost:3001/suppliers/',
         prepareHeaders: (headers) => {
-            const token = localStorage.getItem('token')
+            const authToken = localStorage.getItem('authToken')
 
-            if (token) {
-                headers.set('authorization', token)
+            if (authToken) {
+                headers.set('authorization', authToken)
             }
 
             return headers
         },
     }),
     endpoints: (builder) => {return {
-        getSuppliersList: builder.query<Supplier[], void>({
+        getSuppliersList: builder.query<SupplierResponseData, void>({
             query: () => 'list',
         }),
-        getSupplierById: builder.query<Supplier, string>({
+        getSupplierById: builder.query<{ data: Supplier }, string>({
             query: (supplierId) =>`view/${supplierId}`
         }),
         postSupplier: builder.mutation<Supplier, Partial<Supplier>>({
             query: (form) => ({
                 url: 'create',
                 method: 'post',
-                body: form,
+                body: includeRefreshToken(form),
                 headers: {
                     "Content-Type": "application/json;",
                 }
@@ -38,9 +54,9 @@ export const suppliersApi = createApi({
         }),
         putSupplier: builder.mutation<Supplier, Partial<Supplier>>({
             query: (form: Partial<Supplier>) => ({
-                url: `update/${form.id}`,
+                url: `update/${form._id}`,
                 method: 'put',
-                body: form,
+                body: includeRefreshToken(form),
                 headers: {
                     "Content-Type": "application/json;",
                 }

@@ -8,42 +8,23 @@ import {
     TableContainer,
 } from '@chakra-ui/react'
 import { format } from 'date-fns';
-import { useGetSuppliersListQuery } from "@/lib/redux/services/suppliersApi";
+import { useGetSuppliersListQuery, SupplierData, Supplier } from "@/lib/redux/services/suppliersApi";
 import React from "react";
 
-interface Supplier {
-    _id: string;
-    SupplierId: number;
-    Name: string;
-    Address: string;
-    CreatedByUser: string;
-    CreatedOn: string;
-}
-
-interface SupplierData {
-    [key: string]: Supplier;
-}
-
-const SupplierRows = (props: {data: SupplierData }) => {
-    const { data } = props;
+const SupplierRow = ({ supplier: { _id, Name, Address, CreatedOn }}: { supplier: Supplier}) => {
     return (
-        <>
-            {data && Object.entries(data).map(([key, { SupplierId, Name, Address, CreatedOn }]) => (
-                <Tr key={key}>
-                    <Td>{SupplierId}</Td>
-                    <Td>{Name}</Td>
-                    <Td>{Address}</Td>
-                    <Td>{format(new Date(CreatedOn), "yyyy-MM-dd HH:mm:ss")}</Td>
-                </Tr>
-            ))}
-        </>
+        <Tr>
+            <Td>{_id}</Td>
+            <Td>{Name}</Td>
+            <Td>{Address}</Td>
+            <Td>{format(new Date(CreatedOn), "yyyy-MM-dd HH:mm:ss")}</Td>
+        </Tr>
     )
 }
 
 const List = () => {
-    const { data, isLoading } = useGetSuppliersListQuery();
+    const { data, isLoading} = useGetSuppliersListQuery();
 
-    // @ts-ignore
     return (
         <div className="container mx-auto mt-8 p-4">
             <div className="overflow-x-auto">
@@ -59,7 +40,9 @@ const List = () => {
                         </Thead>
                         <Tbody>
                             {isLoading && (<Tr><Td colSpan={4}>Loading</Td></Tr>)}
-                            {data && (<SupplierRows data={data.data} />)}
+                            {data && Object.entries(data.data).map(([key, supplier]) => (
+                                <SupplierRow key={key} supplier={supplier} />
+                            ))}
                        </Tbody>
                     </Table>
                 </TableContainer>
