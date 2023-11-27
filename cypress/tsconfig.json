@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "target": "es2015",
-    "module": "es2015", // or "esnext"
-    // other options...
-  },
-  // other configurations...
-}
