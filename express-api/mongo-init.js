@@ -18,7 +18,7 @@ db.createUser({
 
 db = new Mongo().getDB("supplier_service");
 
-db.users.insertOne({ username: "foo", password: "bar123" });
+db.users.insertOne({ username: "foo", password: "$2a$10$8U2Aq6kXU8tbLey4KC0mkuwdpUIzP3uG7ieZBw4dehcDslJmN5qse" });
 
 db.suppliers.insertMany([
     {

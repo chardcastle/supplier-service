@@ -45,16 +45,5 @@ services:
       - ./react-app:/opt/project # Mount the app code (local:container)
       - /opt/project/node_modules/
 
-  # Cypress is for End-to-End testing, restart container to run
-  cypress:
-    build:
-      context: ./cypress
-    container_name: cypress-e2e-qa
-    depends_on:
-      - react-app
-    working_dir: /e2e
-    volumes:
-      - ./cypress:/e2e
-
 volumes:
   mongodb_data:
